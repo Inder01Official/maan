@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jumper Game</title>
+    <title>Jumper - InOut Games</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         body {
-            font-family: 'Montserrat', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Montserrat', sans-serif;
+            background: #16202C;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -27,11 +32,9 @@
             width: 100%;
             max-width: 480px;
             height: 100vh;
-            max-height: 800px;
-            background: #1a1a2e;
-            border-radius: 10px;
+            max-height: 850px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         #gameCanvas {
@@ -45,16 +48,35 @@
             top: 0;
             left: 0;
             width: 100%;
-            padding: 20px;
+            padding: 16px 20px;
             pointer-events: none;
             z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .score-container {
+            background: rgba(22, 32, 44, 0.8);
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            padding: 12px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         #score {
-            color: white;
-            font-size: 24px;
+            color: #fff;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        #multiplier {
+            color: #F19E38;
+            font-size: 14px;
             font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-top: 4px;
         }
 
         #startScreen, #gameOverScreen {
@@ -67,39 +89,58 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(0,0,0,0.8);
+            background: rgba(22, 32, 44, 0.95);
             z-index: 20;
             pointer-events: auto;
+            padding: 20px;
         }
 
         #gameOverScreen {
             display: none;
         }
 
-        h1 {
-            color: #fff;
-            font-size: 48px;
-            margin-bottom: 20px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+        .logo {
+            font-size: 64px;
+            font-weight: 900;
+            background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            filter: drop-shadow(0 4px 8px rgba(255, 165, 0, 0.3));
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .btn {
-            padding: 15px 40px;
+            padding: 18px 60px;
             font-size: 20px;
             font-weight: 700;
-            color: white;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #16202C;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             border: none;
-            border-radius: 30px;
+            border-radius: 12px;
             cursor: pointer;
             margin: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 25px rgba(255, 165, 0, 0.6);
         }
 
         .btn:active {
@@ -108,16 +149,68 @@
 
         #finalScore {
             color: white;
-            font-size: 32px;
+            font-size: 48px;
+            font-weight: 900;
             margin: 20px 0;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        #finalScoreLabel {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .instructions {
-            color: #ccc;
-            font-size: 16px;
-            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            margin-top: 40px;
             text-align: center;
-            line-height: 1.6;
+            line-height: 2;
+            font-weight: 500;
+        }
+
+        .instructions span {
+            color: #FFD700;
+            font-weight: 700;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            color: #FFD700;
+            font-size: 32px;
+            font-weight: 900;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        @media (max-aspect-ratio: 100/160) {
+            .logo {
+                font-size: 48px;
+            }
+            
+            #gameContainer {
+                max-width: 100%;
+                border-radius: 0;
+            }
         }
     </style>
 </head>
@@ -126,23 +219,39 @@
         <canvas id="gameCanvas"></canvas>
         
         <div id="ui">
-            <div id="score">Score: 0</div>
+            <div class="score-container">
+                <div id="score">0</div>
+                <div id="multiplier">x1.0</div>
+            </div>
         </div>
 
         <div id="startScreen">
-            <h1>JUMPER</h1>
-            <button class="btn" id="startBtn">PLAY</button>
+            <div class="logo">JUMPER</div>
+            <div class="subtitle">InOut Games</div>
+            <button class="btn" id="startBtn">Play Now</button>
             <div class="instructions">
-                Click or tap to jump<br>
-                Avoid the obstacles!<br>
-                Collect coins for bonus points!
+                <span>CLICK</span> or <span>SPACEBAR</span> to jump<br>
+                Avoid the obstacles<br>
+                Collect coins for bonus<br>
+                Reach higher multipliers!
             </div>
         </div>
 
         <div id="gameOverScreen">
-            <h1>GAME OVER</h1>
-            <div id="finalScore">Score: 0</div>
-            <button class="btn" id="restartBtn">PLAY AGAIN</button>
+            <div class="logo" style="font-size: 48px;">GAME OVER</div>
+            <div id="finalScoreLabel">Your Score</div>
+            <div id="finalScore">0</div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="bestScore">0</div>
+                    <div class="stat-label">Best</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="coinsCollected">0</div>
+                    <div class="stat-label">Coins</div>
+                </div>
+            </div>
+            <button class="btn" id="restartBtn">Play Again</button>
         </div>
     </div>
 
